@@ -24,9 +24,6 @@ class Game is TIC {
 
 	construct new() {
         TIC.cls(0)
-
-		_t=0
-
         _ship = Ship.new(SCR_WIDTH / 2, SCR_HEIGHT / 2)
 	}
 	
@@ -49,7 +46,6 @@ class Game is TIC {
 		}
 
         _ship.move()
-        // _t=_t+1
     }
 
     draw() {
@@ -118,7 +114,12 @@ class Ship is VectorSprite {
             Line.new(0, -4, -4, 6),
         ]
         _thrust = 0.025
+        _rotate_speed = 0.1
         super(x, y, lines)
+    }
+
+    rotate() {
+        super.rotate(_rotate_speed)
     }
 
     accelerate() {
