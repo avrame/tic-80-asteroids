@@ -108,10 +108,9 @@ class VectorSprite {
 class Ship is VectorSprite {
     construct new(x, y) {
         var lines = [
-            Line.new(0, -4, 4, 6),
-            Line.new(3, 5, 0, 3),
-            Line.new(0, 3, -4, 6),
-            Line.new(0, -4, -4, 6),
+            Line.new(0, -6, 4, 5),
+            Line.new(0, -6, -4, 5),
+            Line.new(-2.25, 3, 2.25, 3),
         ]
         _thrust = 0.025
         _rotate_speed = 0.1
