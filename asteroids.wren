@@ -35,6 +35,9 @@ class Game is TIC {
     update() {
         if (TIC.btn(BTN_P1["up"])) {
             _ship.accelerate()
+            _ship.showThrust()
+        } else {
+            _ship.hideThrust()
         }
 
         if (TIC.btn(BTN_P1["left"])) {
@@ -55,11 +58,11 @@ class Game is TIC {
 }
 
 class VectorSprite {
-    construct new(x, y, lines) {
+    construct new(x, y, shapes) {
         _x = x
         _y = y
         _rot = 0
-        _lines = lines
+        _shapes = shapes
         _vel = Vec.new(0, 0)
     }
 
@@ -80,14 +83,10 @@ class VectorSprite {
 
     rot { _rot }
 
-    add_line(line) {
-        _lines.add(line)
-    }
-
     rotate(deg) {
         _rot = _rot + deg
-        for (line in _lines) {
-            line.rotate(deg)
+        for (shape in _shapes) {
+            shape.rotate(deg)
         }
     }
 
@@ -99,23 +98,27 @@ class VectorSprite {
     }
 
     draw() {
-        for (line in _lines) {
-            line.draw(_x, _y)
+        for (shape in _shapes) {
+            shape.draw(_x, _y)
         }
     }
 }
 
 class Ship is VectorSprite {
     construct new(x, y) {
-        var lines = [
+        _ship_body = Shape.new([
             Line.new(0, -6, 4, 5),
             Line.new(0, -6, -4, 5),
             Line.new(-2.25, 3, 2.25, 3),
-        ]
+        ], true)
+        _ship_thrust = Shape.new([
+            Line.new(-2.25, 3, 0, 6.25),
+            Line.new(2.25, 3, 0, 6.25),
+        ], false)
         _thrust = 0.025
         _rotate_speed = 0.1
         _max_speed = 2.5
-        super(x, y, lines)
+        super(x, y, [_ship_body, _ship_thrust])
     }
 
     rotate() {
@@ -130,6 +133,38 @@ class Ship is VectorSprite {
         if (speed <= _max_speed) {
             vel.x = vel_x
             vel.y = vel_y
+        }
+    }
+
+    showThrust() {
+        _ship_thrust.visible = true
+    }
+
+    hideThrust() {
+        _ship_thrust.visible = false
+    }
+}
+
+class Shape {
+    construct new(lines, visible) {
+        _lines = lines
+        _visible = visible
+    }
+
+    visible { _visible }
+
+    visible=(val) { _visible = val }
+
+    draw(parent_x, parent_y) {
+        if (!_visible) return
+        for (line in _lines) {
+            line.draw(parent_x, parent_y)
+        }
+    }
+
+    rotate(deg) {
+        for (line in _lines) {
+            line.rotate(deg)
         }
     }
 }
@@ -152,10 +187,13 @@ class Line {
     }
 
     rotate(deg) {
-        var x1 = _x1 * deg.cos - _y1 * deg.sin
-        var y1 = _y1 * deg.cos + _x1 * deg.sin
-        var x2 = _x2 * deg.cos - _y2 * deg.sin
-        var y2 = _y2 * deg.cos + _x2 * deg.sin
+        var cos = deg.cos
+        var sin = deg.sin
+
+        var x1 = _x1 * cos - _y1 * sin
+        var y1 = _y1 * cos + _x1 * sin
+        var x2 = _x2 * cos - _y2 * sin
+        var y2 = _y2 * cos + _x2 * sin
 
         _x1 = x1
         _y1 = y1
@@ -167,8 +205,8 @@ class Line {
         TIC.line(_x1, _y1, _x2, _y2, _color)
     }
 
-    draw(x_offset, y_offset) {
-        TIC.line(_x1 + x_offset, _y1 + y_offset, _x2 + x_offset, _y2 + y_offset, _color)
+    draw(parent_x, parent_y) {
+        TIC.line(_x1 + parent_x, _y1 + parent_y, _x2 + parent_x, _y2 + parent_y, _color)
     }
 }
 
