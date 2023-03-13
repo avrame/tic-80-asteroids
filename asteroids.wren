@@ -115,6 +115,7 @@ class Ship is VectorSprite {
         ]
         _thrust = 0.025
         _rotate_speed = 0.1
+        _max_speed = 2.5
         super(x, y, lines)
     }
 
@@ -123,8 +124,14 @@ class Ship is VectorSprite {
     }
 
     accelerate() {
-        vel.x = vel.x + rot.sin * _thrust
-        vel.y = vel.y - rot.cos * _thrust
+        var vel_x = vel.x + rot.sin * _thrust
+        var vel_y = vel.y - rot.cos * _thrust
+
+        var speed = (vel_x.pow(2) + vel_y.pow(2)).sqrt
+        if (speed <= _max_speed) {
+            vel.x = vel_x
+            vel.y = vel_y
+        }
     }
 }
 
